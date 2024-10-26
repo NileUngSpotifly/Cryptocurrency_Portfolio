@@ -1,5 +1,5 @@
 async function getCryptoPrice(crypto) {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd')
+    const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd`)
     const data = await response.json();
     return data[crypto] ? data[crypto].usd : null;
 }
@@ -7,10 +7,10 @@ async function getCryptoPrice(crypto) {
 document.getElementById("addCryptoForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const cryptoName = document.getElementById("cryptoName").value;
-    const amount = document.getElementById("amount").value;
+    const cryptoName = document.getElementById("cryptoName").value.toLowerCase().trim();
+    const amount = parseFloat(document.getElementById("amount").value);
 
-    const table = document.getElementById("portfolioTable").getElementsByTagname("tbody")[0];
+    const table = document.getElementById("portfolioTable").getElementsByTagName("tbody")[0];
     const newRow = table.insertRow();
 
     const cell1 = newRow.insertCell(0);
@@ -19,7 +19,7 @@ document.getElementById("addCryptoForm").addEventListener("submit", async functi
     const cell4 = newRow.insertCell(3);
     const cell5 = newRow.insertCell(4);
 
-    cell1.innerHTML = cryptoName;
+    cell1.innerHTML = cryptoName.toUpperCase();
     cell2.innerHTML = amount;
     cell3.innerHTML = 'Loading...';
     cell4.innerHTML = 'Loading...';
@@ -27,8 +27,8 @@ document.getElementById("addCryptoForm").addEventListener("submit", async functi
 
     const price = await getCryptoPrice(cryptoName);
     if (price) {
-        cell3.innerHTML = "${price}";
-        cell4.innerHTML = "${(price * amount).toFixed(2)}";
+        cell3.innerHTML = `$${price}`;
+        cell4.innerHTML = `$${(price * amount).toFixed(2)}`;
     } else {
         cell3.innerHTML = 'Not available';
         cell4.innerHTML = 'Not available';
