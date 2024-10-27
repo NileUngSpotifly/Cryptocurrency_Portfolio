@@ -1,43 +1,74 @@
-async function getCryptoPrice(crypto) {
-    const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd`)
-    const data = await response.json();
-    return data[crypto] ? data[crypto].usd : null;
+// Function to fetch cryptocurrency data from CoinRanking API
+async function fetchCryptoData() {
+	try {
+		const response = await
+			fetch('https://api.coinranking.com/v2/coins');
+		const data = await response.json();
+		return data.data.coins;
+	} catch (error) {
+		console.error('Error fetching cryptocurrency data:', error);
+		return [];
+	}
 }
 
-document.getElementById("addCryptoForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+// Function to display cryptocurrency data in the table
+function displayCryptoData(coins) {
+	const cryptoTable = document.getElementById('cryptoTable');
+	cryptoTable.innerHTML = '';
 
-    const cryptoName = document.getElementById("cryptoName").value.toLowerCase().trim();
-    const amount = parseFloat(document.getElementById("amount").value);
+	coins.forEach(coin => {
+		const row = document.createElement('tr');
+		row.innerHTML = `
+		<td><img src="${coin.iconUrl}"
+		class="crypto-logo" alt="${coin.name}"></td>
+			<td>${coin.name}</td>
+			<td>${coin.symbol}</td>
+			<td>$${coin.price}</td>
+			<td>${coin.change}%</td>
+			<td>${coin.volume ? coin.volume : '-'}</td>
+			<td>${coin.marketCap ? coin.marketCap : '-'}</td>
+		`;
+		cryptoTable.appendChild(row);
+	});
+}
 
-    const table = document.getElementById("portfolioTable").getElementsByTagName("tbody")[0];
-    const newRow = table.insertRow();
+// Function to filter cryptocurrencies based on user input
+function filterCryptoData(coins, searchTerm) {
+	searchTerm = searchTerm.toLowerCase();
 
-    const cell1 = newRow.insertCell(0);
-    const cell2 = newRow.insertCell(1);
-    const cell3 = newRow.insertCell(2);
-    const cell4 = newRow.insertCell(3);
-    const cell5 = newRow.insertCell(4);
+	const filteredCoins = coins.filter(coin =>
+		coin.name.toLowerCase().includes(searchTerm) ||
+		coin.symbol.toLowerCase().includes(searchTerm)
+	);
 
-    cell1.innerHTML = cryptoName.toUpperCase();
-    cell2.innerHTML = amount;
-    cell3.innerHTML = 'Loading...';
-    cell4.innerHTML = 'Loading...';
-    cell5.innerHTML = '<button class="delete-btn">Delete</button>';
+	return filteredCoins;
+}
 
-    const price = await getCryptoPrice(cryptoName);
-    if (price) {
-        cell3.innerHTML = `$${price}`;
-        cell4.innerHTML = `$${(price * amount).toFixed(2)}`;
-    } else {
-        cell3.innerHTML = 'Not available';
-        cell4.innerHTML = 'Not available';
-    }
+// Function to handle search input
+function handleSearchInput() {
+	const searchInput = document.getElementById('searchInput');
+	const searchTerm = searchInput.value.trim();
 
-    document.getElementById("cryptoName").value = '';
-    document.getElementById("amount").value = '';
+	fetchCryptoData().then(coins => {
+		const filteredCoins = filterCryptoData(coins,
+			searchTerm);
+		displayCryptoData(filteredCoins);
+	});
+}
 
-    cell5.querySelector('.delete-btn').addEventListener('click', function() {
-        table.deleteRow(newRow.rowIndex - 1);
-    });
-});
+// Function to initialize the app
+async function initializeApp() {
+	const coins = await fetchCryptoData();
+	displayCryptoData(coins);
+
+	// Add event listener to search input
+	const searchInput = 
+		document.getElementById('searchInput');
+	searchInput.addEventListener('input',
+		handleSearchInput);
+}
+
+// Call initializeApp function
+// when the DOM content is loaded
+document.addEventListener('DOMContentLoaded'
+	, initializeApp);
