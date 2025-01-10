@@ -29,8 +29,8 @@ Easy as it gets - using the same old HTML, some magic of CSS and script for fanc
 ## Technologies
 
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap.
-- **Backend**: Requests to APIs for cryptocurrency data (e.g., [CoinGecko API](https://www.coingecko.com/en/api)).
-- **Integrations**: Ability to add additional APIs for broader capabilities (e.g., Binance API).
+- **Backend**: Requests to APIs for cryptocurrency data (e.g., [Coinranking API](https://coinranking.com)).
+- **Integrations**: Ability to add additional APIs for broader capabilities.
 
 ## Installation
 
